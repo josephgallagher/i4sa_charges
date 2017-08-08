@@ -1,0 +1,57 @@
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+{% extends "layout.html" %}
+{% block content %}
+    <form action="/charge" id="myForm" method="post">
+        <article>
+            <label>
+                <span>Enter Amount</span>
+            </label>
+        </article>
+        <input type="text" id="amount" name="amount"/>
+        <input type="hidden" id="stripeToken" name="stripeToken"/>
+        <input type="hidden" id="stripeEmail" name="stripeEmail"/>
+
+        {#            <script src="https://checkout.stripe.com/checkout.js" class="stripe-button"#}
+        {#                    data-key="{{ key }}"#}
+        {#                    data-description="A Flask Charge"#}
+        {#                    data-amount="500"#}
+        {#                    data-locale="auto"></script>#}
+
+
+        <button id="customButton">Charge</button>
+
+        <script src="https://checkout.stripe.com/checkout.js" data-amount="#amount"></script>
+
+        <script>
+            var handler = StripeCheckout.configure({
+                key: 'pk_test_2iglUrpb6YKX2uzV46WLoBnM',
+                image: 'https://stripe.com/img/documentation/checkout/marketplace.png',
+                locale: 'auto',
+                token: function (token) {
+                    $("#stripeToken").val(token.id);
+                    $("#stripeEmail").val(token.email);
+                    $("#myForm").submit();
+                }
+            });
+
+
+
+            $('#customButton').on('click', function (e) {
+                var amount = Math.round($("#amount").val() * 100);
+                // Open Checkout with further options
+                handler.open({
+                    name: 'i4sa',
+                    description: 'SAII Payment Portal',
+                    amount: amount
+                });
+                e.preventDefault();
+            });
+
+            // Close Checkout on page navigation:
+            window.addEventListener('popstate', function () {
+                handler.close();
+            });
+        </script>
+
+    </form>
+{% endblock %}
